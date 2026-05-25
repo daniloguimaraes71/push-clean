@@ -1,0 +1,40 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: chore
+      POSTGRES_PASSWORD: chore
+      POSTGRES_DB: chorecast
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U chore -d chorecast"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    environment:
+      DATABASE_URL: postgresql+asyncpg://chore:chore@postgres:5432/chorecast
+      TEST_DATABASE_URL: postgresql+asyncpg://chore:chore@postgres:5432/chorecast_test
+      OPENROUTER_API_KEY: ""
+      OPENROUTER_MODEL: deepseek/deepseek-v4-flash:free
+      OPENROUTER_BASE_URL: https://openrouter.ai/api/v1
+      LLM_LIVE: "0"
+      VISION_ENABLED: "0"
+      VISION_MODEL: ""
+      LOG_LEVEL: INFO
+    ports:
+      - "8000:8000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    command: ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
+
+volumes:
+  pgdata:

@@ -1,0 +1,13 @@
+{
+  "compilerOptions": {
+    "strict": true,
+    "jsx": "react-native",
+    "moduleResolution": "node",
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "resolveJsonModule": true,
+    "noEmit": true,
+    "types": ["jest"]
+  },
+  "include": ["App.tsx", "src/**/*", "__tests__/**/*"]
+}
